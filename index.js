@@ -43,7 +43,7 @@ app.post("/tasks", (req, res) => {
     return res.status(400).send("Request body is missing");
   }
   const { title } = req.body;
-  const q = "INSERT INTO student (tasks) VALUES (?)";
+  const q = "INSERT INTO tasks (Task) VALUES (?)";
   db.query(q, [title], (err, data) => {
     if (err) {
       return res.status(500).json({message:"Database error",error:err})
