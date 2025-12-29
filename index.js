@@ -165,7 +165,7 @@ app.post("/signup", (req, res) => {
       return res.status(409).json("Email already exists");
     }
     const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
+    const hashedPassword=bcrypt.hashSync(password, salt);
 
     const insertQuery = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
     db.query(insertQuery, [name, email, hashedPassword], (err, result) => {
