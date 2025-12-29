@@ -148,6 +148,32 @@ app.post("/login", (req, res) => {
     res.status(200).json("Login success");
   });
 });
+/* ----------------------------------------------------
+    Sign up 
+---------------------------------------------------- */
+app.post("/signup", (req, res) => {
+  const { name, email, password } = req.body;
 
+  if (!name || !email || !password) {
+    return res.status(400).json("Name, email, and password are required");
+  }
+  const checkQuery = "SELECT * FROM users WHERE email = ?";
+  db.query(checkQuery, [email], (err, data) => {
+    if (err) return res.status(500).json(err);
+
+    if (data.length > 0) {
+      return res.status(409).json("Email already exists");
+    }
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    const insertQuery = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+    db.query(insertQuery, [name, email, hashedPassword], (err, result) => {
+      if (err) return res.status(500).json(err);
+
+      res.status(201).json("User registered successfully");
+    });
+  });
+});
 
 });
