@@ -46,11 +46,27 @@ app.post("/tasks", (req, res) => {
   const q = "INSERT INTO tasks (Task) VALUES (?)";
   db.query(q, [title], (err, data) => {
     if (err) {
-      return res.status(500).json({message:"Database error",error:err})
-    }else{
-      return res.status(201).json({message:"Tasks created successfully",
-        id:data.insertId
-      })
+      return res.status(500).json({ message: "Database error", error: err });
+    } else {
+      return res
+        .status(201)
+        .json({ message: "Tasks created successfully", id: data.insertId });
     }
   });
 });
+
+app.put("/tasks/:id",(req,res)=>{
+if(!req.body){
+  return res.status(400).send("Request body is missing")
+
+}
+const {id}=req.params;
+const{newtitle}=req.body;
+if(!id){
+  return res.status(400).send("")
+}
+if (isNaN(Number(id))) {
+    return res.status(400).json({ message: "Student ID must be a number" });
+  }
+
+})
