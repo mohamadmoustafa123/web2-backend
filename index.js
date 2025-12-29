@@ -111,6 +111,16 @@ app.put("/tasksIsCompleted/:id", (req, res) => {
     if (isNaN(Number(id))) {
       return res.status(400).json({ message: "Student ID must be a number" });
     }
-    
+    const q = "DELETE FROM tasks WHERE id = ?";
+    db.query(q, [id], (err, data) => {
+      if (err) {
+        return res.status(500).json({ message: "Database error", error: err });
+      } else {
+        if (data.affectedRows === 0) {
+          return res.status(404).json({ message: "task not found" });
+        }
+        return res.status(200).json({ message: "Task deleted successfully" });
+      }
+    });
   });
 });
