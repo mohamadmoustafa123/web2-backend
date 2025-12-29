@@ -161,7 +161,7 @@ app.post("/signup", (req, res) => {
   db.query(checkQuery, [email], (err, data) => {
     if (err) return res.status(500).json(err);
 
-    if (data.length > 0) {
+    if (data.length >0) {
       return res.status(409).json("Email already exists");
     }
     const salt = bcrypt.genSaltSync(10);
