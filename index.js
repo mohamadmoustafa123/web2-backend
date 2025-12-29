@@ -68,5 +68,18 @@ if(!id){
 if (isNaN(Number(id))) {
     return res.status(400).json({ message: "Student ID must be a number" });
   }
+  const q =
+    "UPDATE tasks SET Task = ?";
 
+  db.query(q, [newtitle], (err, data) => {
+    if (err) {
+    
+      return res.status(500).json({ message: "Database error", error: err });
+    } else {
+      if (data.affectedRows === 0) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+      return res.status(200).json({ message: "Task updated successfully" });
+    }
+  });
 })
