@@ -55,25 +55,22 @@ app.post("/tasks", (req, res) => {
   });
 });
 
-app.put("/tasks/:id",(req,res)=>{
-if(!req.body){
-  return res.status(400).send("Request body is missing")
-
-}
-const {id}=req.params;
-const{newtitle}=req.body;
-if(!id){
-  return res.status(400).send("you should send an ID")
-}
-if (isNaN(Number(id))) {
+app.put("/tasks/:id", (req, res) => {
+  if (!req.body) {
+    return res.status(400).send("Request body is missing");
+  }
+  const { id } = req.params;
+  const { newtitle } = req.body;
+  if (!id) {
+    return res.status(400).send("you should send an ID");
+  }
+  if (isNaN(Number(id))) {
     return res.status(400).json({ message: "Task ID must be a number" });
   }
-  const q =
-    "UPDATE tasks SET Task = ? WHERE id = ?";
+  const q = "UPDATE tasks SET Task = ? WHERE id = ?";
 
-  db.query(q, [newtitle,id], (err, data) => {
+  db.query(q, [newtitle, id], (err, data) => {
     if (err) {
-    
       return res.status(500).json({ message: "Database error", error: err });
     } else {
       if (data.affectedRows === 0) {
@@ -82,24 +79,21 @@ if (isNaN(Number(id))) {
       return res.status(200).json({ message: "Task updated successfully" });
     }
   });
-})
+});
 
-app.put("/tasksIsCompleted/:id",(req,res)=>{
+app.put("/tasksIsCompleted/:id", (req, res) => {
+  const { id } = req.params;
 
-const {id}=req.params;
-
-if(!id){
-  return res.status(400).send("you should send an ID")
-}
-if (isNaN(Number(id))) {
+  if (!id) {
+    return res.status(400).send("you should send an ID");
+  }
+  if (isNaN(Number(id))) {
     return res.status(400).json({ message: "Task ID must be a number" });
   }
-  const q =
-    "UPDATE tasks SET isCompleted = NOT isCompleted WHERE id = ?";
+  const q = "UPDATE tasks SET isCompleted = NOT isCompleted WHERE id = ?";
 
   db.query(q, [id], (err, data) => {
     if (err) {
-    
       return res.status(500).json({ message: "Database error", error: err });
     } else {
       if (data.affectedRows === 0) {
@@ -108,4 +102,15 @@ if (isNaN(Number(id))) {
       return res.status(200).json({ message: "Task updated successfully" });
     }
   });
-})
+
+  app.delete("/tasks/:id", (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).send("you should send an Id");
+    }
+    if (isNaN(Number(id))) {
+      return res.status(400).json({ message: "Student ID must be a number" });
+    }
+    
+  });
+});
