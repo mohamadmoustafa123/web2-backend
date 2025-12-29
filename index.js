@@ -125,8 +125,29 @@ app.put("/tasksIsCompleted/:id", (req, res) => {
   });
 
 /* ----------------------------------------------------
-    Sign in 
+    Sign in   login 
 ---------------------------------------------------- */
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json("Email and password are required");
+  }
+  const q = "SELECT * FROM users WHERE email = ?";
+  db.query(q, [email], (err, data) => {
+    if (err) return res.status(500).json(err);
+
+    if (data.length === 0) {
+      return res.status(401).json("Email or password incorrect");
+    }
+
+    const isMatch = bcrypt.compareSync(password, data[0].password);
+    if (!isMatch) {
+      return res.status(401).json("Email or password incorrect");
+    }
+    res.status(200).json("Login success");
+  });
+});
 
 
 });
