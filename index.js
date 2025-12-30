@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mysql from "mysql2";
+import bcrypt from "bcryptjs";
 const app = express();
 
 app.use(cors());
@@ -102,28 +103,28 @@ app.put("/tasksIsCompleted/:id", (req, res) => {
       return res.status(200).json({ message: "Task updated successfully" });
     }
   });
+});
 
-  app.delete("/tasks/:id", (req, res) => {
-    const { id } = req.params;
-    if (!id) {
-      return res.status(400).send("you should send an Id");
-    }
-    if (isNaN(Number(id))) {
-      return res.status(400).json({ message: "Student ID must be a number" });
-    }
-    const q = "DELETE FROM tasks WHERE id = ?";
-    db.query(q, [id], (err, data) => {
-      if (err) {
-        return res.status(500).json({ message: "Database error", error: err });
-      } else {
-        if (data.affectedRows === 0) {
-          return res.status(404).json({ message: "task not found" });
-        }
-        return res.status(200).json({ message: "Task deleted successfully" });
+app.delete("/tasks/:id", (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).send("you should send an Id");
+  }
+  if (isNaN(Number(id))) {
+    return res.status(400).json({ message: "Student ID must be a number" });
+  }
+  const q = "DELETE FROM tasks WHERE id = ?";
+  db.query(q, [id], (err, data) => {
+    if (err) {
+      return res.status(500).json({ message: "Database error", error: err });
+    } else {
+      if (data.affectedRows === 0) {
+        return res.status(404).json({ message: "task not found" });
       }
-    });
+      return res.status(200).json({ message: "Task deleted successfully" });
+    }
   });
-
+});
 /* ----------------------------------------------------
     Sign in   login 
 ---------------------------------------------------- */
@@ -133,15 +134,15 @@ app.post("/login", (req, res) => {
   if (!email || !password) {
     return res.status(400).json("Email and password are required");
   }
-  const q = "SELECT * FROM users WHERE email = ?";
-  db.query(q, [email], (err, data) => {
+  const q = "SELECT * FROM users WHERE Email = ? ";
+  db.query(q, [email, password], (err, data) => {
     if (err) return res.status(500).json(err);
 
     if (data.length === 0) {
       return res.status(401).json("Email or password incorrect");
     }
 
-    const isMatch = bcrypt.compareSync(password, data[0].password);
+    const isMatch = bcrypt.compareSync(password, data[0].Password);
     if (!isMatch) {
       return res.status(401).json("Email or password incorrect");
     }
@@ -157,23 +158,19 @@ app.post("/signup", (req, res) => {
   if (!name || !email || !password) {
     return res.status(400).json("Name, email, and password are required");
   }
-  const checkQuery = "SELECT * FROM users WHERE email = ?";
-  db.query(checkQuery, [email], (err, data) => {
-    if (err) return res.status(500).json(err);
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
+  const insertQuery =
+    "INSERT INTO users (Name, Email, Password) VALUES (?, ?, ?)";
 
-    if (data.length >0) {
-      return res.status(409).json("Email already exists");
+  db.query(insertQuery, [name, email, hashedPassword], (err, data) => {
+    if (err) {
+      if (err.errno == 1062) {
+        return res.status(401).send(err.sqlMessage)
+      }
+      return res.status(500).json(err);
     }
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword=bcrypt.hashSync(password, salt);
 
-    const insertQuery = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-    db.query(insertQuery, [name, email, hashedPassword], (err, result) => {
-      if (err) return res.status(500).json(err);
-
-      res.status(201).json("User registered successfully");
-    });
+    return res.status(201).json("success register");
   });
-});
-
 });
