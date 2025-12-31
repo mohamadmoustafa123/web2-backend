@@ -2,20 +2,22 @@ import express from "express";
 import cors from "cors";
 import mysql from "mysql2";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv"
 const app = express();
-
+dotenv.config();
 app.use(cors());
 app.use(express.json());
 app.listen(5000, () => {
   console.log("Server is Running");
 });
+console.log(process.env.MYSQLHOST)
 
 const db = mysql.createPool({
-  port: 3306,
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "todolist",
+  port: process.env.MYSQLPORT,
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password:process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
 });
 db.getConnection((err) => {
   if (err) {
