@@ -173,6 +173,6 @@ app.post("/signup", (req, res) => {
       return res.status(500).json(err);
     }
 
-    return res.status(201).json("success register");
+    return res.status(201).send("success register");
   });
 });
