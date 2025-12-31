@@ -166,7 +166,7 @@ app.post("/signup", (req, res) => {
   db.query(insertQuery, [name, email, hashedPassword], (err, data) => {
     if (err) {
       if (err.errno == 1062) {
-        return res.status(401).send(err.sqlMessage)
+        return res.status(401).send(err.sqlMessage);
       }
       return res.status(500).json(err);
     }
