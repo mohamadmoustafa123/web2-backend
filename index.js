@@ -157,7 +157,7 @@ app.post("/login", (req, res) => {
 app.post("/signup", (req, res) => {
   const { name, email, password,confirmPassword } = req.body;
 
-  if (!name || !email || !password ||confirmPassword) {
+  if (!name || !email || !password ||!confirmPassword) {
     return res.status(400).json("Name, email, and password are required");
   }
   if(password!=confirmPassword){
