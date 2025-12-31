@@ -155,10 +155,13 @@ app.post("/login", (req, res) => {
     Sign up 
 ---------------------------------------------------- */
 app.post("/signup", (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password,confirmPassword } = req.body;
 
-  if (!name || !email || !password) {
+  if (!name || !email || !password ||confirmPassword) {
     return res.status(400).json("Name, email, and password are required");
+  }
+  if(password!=confirmPassword){
+    return res.status(400).send("Password and confirm password are different")
   }
   const salt = bcrypt.genSaltSync(10);
   const hashedPassword = bcrypt.hashSync(password, salt);
